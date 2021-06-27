@@ -27,6 +27,14 @@ type token =
   | TIMES
   | DIV
   | MOD
+  | PLUSPLUS
+  | MINUSMINUS
+  | PLUSASSIGN
+  | MINUSASSIGN
+  | TIMESASSIGN
+  | DIVASSIGN
+  | MODASSIGN
+  | PLUSPLUSPLUS
   | CHAR
   | ELSE
   | IF
@@ -41,8 +49,10 @@ type token =
   | FLOAT
   | SWITCH
   | CASE
+  | FOR
   | CSTSTRING of (string)
   | NAME of (string)
+  | CSTCHAR of (char)
   | CSTFLOAT of (float32)
   | CSTINT of (int)
   | CSTBOOL of (int)
@@ -73,6 +83,14 @@ type tokenId =
     | TOKEN_TIMES
     | TOKEN_DIV
     | TOKEN_MOD
+    | TOKEN_PLUSPLUS
+    | TOKEN_MINUSMINUS
+    | TOKEN_PLUSASSIGN
+    | TOKEN_MINUSASSIGN
+    | TOKEN_TIMESASSIGN
+    | TOKEN_DIVASSIGN
+    | TOKEN_MODASSIGN
+    | TOKEN_PLUSPLUSPLUS
     | TOKEN_CHAR
     | TOKEN_ELSE
     | TOKEN_IF
@@ -87,8 +105,10 @@ type tokenId =
     | TOKEN_FLOAT
     | TOKEN_SWITCH
     | TOKEN_CASE
+    | TOKEN_FOR
     | TOKEN_CSTSTRING
     | TOKEN_NAME
+    | TOKEN_CSTCHAR
     | TOKEN_CSTFLOAT
     | TOKEN_CSTINT
     | TOKEN_CSTBOOL
@@ -100,6 +120,7 @@ type nonTerminalId =
     | NONTERM_Topdecs
     | NONTERM_Topdec
     | NONTERM_Vardec
+    | NONTERM_VardecAndAssignment
     | NONTERM_Vardesc
     | NONTERM_Fundec
     | NONTERM_Paramdecs
@@ -119,6 +140,8 @@ type nonTerminalId =
     | NONTERM_Const
     | NONTERM_ConstFloat
     | NONTERM_Type
+    | NONTERM_ConstChar
+    | NONTERM_ConstString
 /// This function maps tokens to integer indexes
 val tagOfToken: token -> int
 

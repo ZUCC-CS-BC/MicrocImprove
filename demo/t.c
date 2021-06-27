@@ -1,25 +1,60 @@
-// micro-C example 1
-(*n=n+1*)
-int g ;
-int h[3] ;
-void main(int n) {
-  h[0] = 1;
-  // h[4] = 5;
-  // print h[3]; //数组首地址
-  // print h[4]; //参数 n
-  // h[5] = 5;
-  // h[6] = 5;
-  // h[7] = 5;
-  // h[9] = 5;
-  // h[10] = 5;
-  // h[11] = 5;
-  // h[12] = 5;
-  // 数组越界，程序的行为会异常
-  // 此时解释器，栈式虚拟机，x86程序表现各不相同，可以思考原因
+(* 张伯辰 *)
+void main() {
 
-  while (n > 0) {
-    print n;
-    n = n - 1;
-  }
-  println;
+
+
+  int i = 0;
+  do
+  {
+    print i;
+  } while ( i = 0)
+  
+
+  // //运算符
+  // int i = 1;
+  // int j;
+  // int k;
+  // int m;
+  // int n;
+  // j = 1;
+  // k = 1;
+  // m = 1;
+  // n = 1;
+  // i++;
+  // ++j;
+  // k--;
+  // --m;
+  // n+++;
+  // print i;
+  // print j;
+  // print k;
+  // print m;
+  // print n;
+  // //+= -= *= /= %=
+  // int a;
+  // int b;
+  // a = 5;
+  // b = 2;
+  // a %= b;
+  // print a;
+
+  // //for循环
+  // int i;
+  // int j = 1;
+  // for (i = 0; i < 2; i++)
+  // {
+  //   j++;
+  // }
+  // print j;
+  // int i = 0;
+  // do
+  // {
+  //   /* code */
+  //   print i
+  // } while(i = 0) ;
+  
+  //char
+  // char c;
+  // c='a';
+
 }
