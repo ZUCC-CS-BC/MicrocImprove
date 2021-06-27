@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "eCRGRdi++7hIVQXaIzWEfHPkKdkSvY+K0dnc+bnfWuFgZuscLVDUzgloSYxSrA/gR5mPfgCiFGwWG2QQXQZkqw==",
+  "dgSpecHash": "0reVboeYMgh8PdKQdiw/wMy6bViTYM4P2UsqVyUm6QbRnVadU39LPLT1eVfD/Fl4LyearP9LdEfh6hQ/NuiUoQ==",
   "success": true,
-  "projectFilePath": "G:\\bochen\\BYYL\\newbig\\microc\\microcc.fsproj",
+  "projectFilePath": "G:\\bochen\\BYYL\\newbig\\microc\\interpc.fsproj",
   "expectedPackageFiles": [
     "C:\\Users\\86139\\.nuget\\packages\\fsharp.core\\5.0.0\\fsharp.core.5.0.0.nupkg.sha512",
-    "C:\\Users\\86139\\.nuget\\packages\\fslexyacc\\10.0.0\\fslexyacc.10.0.0.nupkg.sha512",
-    "C:\\Users\\86139\\.nuget\\packages\\fslexyacc.runtime\\10.0.0\\fslexyacc.runtime.10.0.0.nupkg.sha512"
+    "C:\\Users\\86139\\.nuget\\packages\\fslexyacc\\10.2.0\\fslexyacc.10.2.0.nupkg.sha512",
+    "C:\\Users\\86139\\.nuget\\packages\\fslexyacc.runtime\\10.2.0\\fslexyacc.runtime.10.2.0.nupkg.sha512"
   ],
   "logs": []
 }
