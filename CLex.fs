@@ -428,7 +428,7 @@ and SedComment  lexbuf =
   match _fslex_tables.Interpret(16,lexbuf) with
   | 0 -> ( 
 # 114 "CLex.fsl"
-                                     Comment lexbuf; Comment lexbuf 
+                                     SedComment lexbuf; SedComment lexbuf 
 # 432 "CLex.fs"
           )
   | 1 -> ( 
@@ -438,17 +438,17 @@ and SedComment  lexbuf =
           )
   | 2 -> ( 
 # 116 "CLex.fsl"
-                                     lexbuf.EndPos <- lexbuf.EndPos.NextLine; Comment lexbuf 
+                                     lexbuf.EndPos <- lexbuf.EndPos.NextLine; SedComment lexbuf 
 # 442 "CLex.fs"
           )
   | 3 -> ( 
 # 117 "CLex.fsl"
-                                     failwith "Lexer error: unterminated comment" 
+                                     failwith "Lexer error: unterminated Sedcomment" 
 # 447 "CLex.fs"
           )
   | 4 -> ( 
 # 118 "CLex.fsl"
-                                     Comment lexbuf 
+                                     SedComment lexbuf 
 # 452 "CLex.fs"
           )
   | _ -> failwith "SedComment"

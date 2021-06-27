@@ -111,11 +111,11 @@ and Comment = parse
    | _              { Comment lexbuf }  // 其他任意情况都继续处理后续字符
 
 and SedComment = parse
-   | "(*"           { Comment lexbuf; Comment lexbuf }  // 注释的嵌套处理
+   | "(*"           { SedComment lexbuf; SedComment lexbuf }  // 注释的嵌套处理
    | "*)"           { () }                           // 注释处理结束
-   | '\n'           { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Comment lexbuf } //注释跨行处理
-   | (eof | '\026') { failwith "Lexer error: unterminated comment" }  // 多行注释未封闭
-   | _              { Comment lexbuf }  // 其他任意情况都继续处理后续字符
+   | '\n'           { lexbuf.EndPos <- lexbuf.EndPos.NextLine; SedComment lexbuf } //注释跨行处理
+   | (eof | '\026') { failwith "Lexer error: unterminated Sedcomment" }  // 多行注释未封闭
+   | _              { SedComment lexbuf }  // 其他任意情况都继续处理后续字符
 
 and EndLineComment = parse
    | '\n'           { lexbuf.EndPos <- lexbuf.EndPos.NextLine }  //更新行尾位置，返回
