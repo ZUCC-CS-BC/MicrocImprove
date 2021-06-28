@@ -50,6 +50,7 @@ type token =
   | SWITCH
   | CASE
   | FOR
+  | DEFAULT
   | CSTSTRING of (string)
   | NAME of (string)
   | CSTCHAR of (char)
@@ -106,6 +107,7 @@ type tokenId =
     | TOKEN_SWITCH
     | TOKEN_CASE
     | TOKEN_FOR
+    | TOKEN_DEFAULT
     | TOKEN_CSTSTRING
     | TOKEN_NAME
     | TOKEN_CSTCHAR
@@ -131,7 +133,7 @@ type nonTerminalId =
     | NONTERM_StmtM
     | NONTERM_StmtU
     | NONTERM_Expr
-    | NONTERM_StmtCase
+    | NONTERM_ExecCase
     | NONTERM_ExprNotAccess
     | NONTERM_AtExprNotAccess
     | NONTERM_Access

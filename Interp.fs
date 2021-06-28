@@ -255,15 +255,42 @@ let rec exec stmt (locEnv: locEnv) (gloEnv: gloEnv) (store: store) : store =
 
         loop store
 
-    | DoWhile(body, e) ->
+    | For ( e1,e2,e3,body ) ->
+        let (res , store0) = eval e1 locEnv gloEnv store
+        let rec loop store1 = 
+            let (ifValue, store2) = eval e2 locEnv gloEnv store1
+            if ifValue<>0 then let (oneend ,store3) = eval e3 locEnv gloEnv (exec body locEnv gloEnv store2)
+                               loop store3
+                          else store2
+        loop store0
+ 
+    | Switch (e, body) ->
+        // eval switch(x)中的x
+        let (v, store1) = eval e locEnv gloEnv store
+
+        let rec fit l =
+            match l with
+            | [] -> store1
+            | Case (e1, body1) :: tail ->
+                let (v2, store2) = eval e1 locEnv gloEnv store
+                //匹配成功退出
+                if v2 = v then
+                    exec body1 locEnv gloEnv store
+                else
+                    fit tail
+            | _ -> failwith ("case error")
+
+        fit body
+
+    | DoWhile (stmt,expr) ->
         
-        //定义 While循环辅助函数 loop
+        //定义DoWhile循环辅助函数 loop
         let rec loop store1 =
             //求值 循环条件,注意变更环境 store
-            let (v, store2) = eval e locEnv gloEnv store1
+            let (v, store2) = eval expr locEnv gloEnv store1
             // 继续循环
             if v <> 0 then
-                loop (exec body locEnv gloEnv store2)
+                loop (exec stmt locEnv gloEnv store2)
             else
                 store2 //退出循环返回 环境store2
 
@@ -366,7 +393,7 @@ and eval e locEnv gloEnv store : int * store =
             | _ -> failwith ("unknown primitive " + ope)
 
         (res, store2)
-    | SimpleOpt (ope,acc,e) ->
+    | Emun (ope,acc,e) ->
         let  (loc, store1) = access acc locEnv gloEnv store // 取acc地址
         let  (i1)  = getSto store1 loc
         let  (i2, store2) = eval e locEnv gloEnv store

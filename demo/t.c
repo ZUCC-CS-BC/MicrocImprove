@@ -1,13 +1,21 @@
-(* 张伯辰 *)
-void main() {
+void main(){
+    int i= 1;
+    switch (i)
+    {
+    case 1:
+      print 11;
+    case 2:
+      print 22;
+    }
 
 
+    // int a;
+    // a=1;
+    // do{a=a+1;
+    // print a;
+    // }
+    // while(a<5)
 
-  int i = 0;
-  do
-  {
-    print i;
-  } while ( i = 0)
   
 
   // //运算符

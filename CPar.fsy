@@ -23,7 +23,7 @@ let nl = CstI 10 //  \n 的 ASCII 码
 %token <char> CSTCHAR
 %token <string> CSTSTRING NAME
 
-%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE DO FLOAT SWITCH CASE FOR
+%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE DO FLOAT SWITCH CASE FOR DEFAULT
 %token PLUS MINUS TIMES DIV MOD PLUSPLUS MINUSMINUS PLUSASSIGN MINUSASSIGN TIMESASSIGN DIVASSIGN MODASSIGN PLUSPLUSPLUS
 %token EQ NE GT LT GE LE
 %token NOT SEQOR SEQAND
@@ -151,7 +151,7 @@ StmtM:  /* No unbalanced if-else */
   | IF LPAR Expr RPAR StmtM ELSE StmtM  { If($3, $5, $7)       }
   | WHILE LPAR Expr RPAR StmtM          { While($3, $5)        }
   | DO StmtM WHILE LPAR Expr RPAR       { DoWhile($2, $5)      }
-  | SWITCH LPAR Expr RPAR LBRACE StmtCase RBRACE        { Switch($3,$6)  }
+  | SWITCH LPAR Expr RPAR LBRACE ExecCase RBRACE { Switch($3, $6) }
   | FOR LPAR Expr SEMI Expr SEMI Expr RPAR StmtM { For($3,$5,$7,$9)  }
 ;
 
@@ -166,9 +166,9 @@ Expr:
   | ExprNotAccess                       { $1                  } 
 ;
 
-StmtCase:
-    CASE AtExprNotAccess COLON StmtM               { [Case($2,$4)]    }  
-  | CASE AtExprNotAccess COLON StmtM StmtCase      { Case($2,$4) :: $5}
+ExecCase:
+    CASE AtExprNotAccess COLON StmtM               { [Case($2,$4)] }
+  | CASE AtExprNotAccess COLON StmtM ExecCase      { Case($2,$4) :: $5}
 ;
 
   //非左值的情况
@@ -191,16 +191,16 @@ ExprNotAccess:
   | Expr LT    Expr                     { Prim2("<",  $1, $3) }
   | Expr GE    Expr                     { Prim2(">=", $1, $3) }
   | Expr LE    Expr                     { Prim2("<=", $1, $3) }
-  | Access PLUSPLUS                       { SimpleOpt("Z++", $1, CstI 1 )   }
-  | Access PLUSPLUSPLUS                   { SimpleOpt("Z+++", $1, CstI 2 )   }
-  | Access MINUSMINUS                     { SimpleOpt("Z--", $1, CstI 1 )   }
-  | PLUSPLUS Access                       { SimpleOpt("++Z", $2, CstI 1 )   }
-  | MINUSMINUS Access                     { SimpleOpt("--Z", $2, CstI 1 )   }  
-  | Access PLUSASSIGN Expr                { SimpleOpt("+=", $1, $3 ) }
-  | Access MINUSASSIGN Expr               { SimpleOpt("-=", $1, $3 ) }
-  | Access TIMESASSIGN Expr               { SimpleOpt("*=", $1, $3 ) }
-  | Access DIVASSIGN Expr                 { SimpleOpt("/=", $1, $3 ) }
-  | Access MODASSIGN Expr                 { SimpleOpt("%=", $1, $3 ) }
+  | Access PLUSPLUS                       { Emun("Z++", $1, CstI 1 )   }
+  | Access PLUSPLUSPLUS                   { Emun("Z+++", $1, CstI 2 )   }
+  | Access MINUSMINUS                     { Emun("Z--", $1, CstI 1 )   }
+  | PLUSPLUS Access                       { Emun("++Z", $2, CstI 1 )   }
+  | MINUSMINUS Access                     { Emun("--Z", $2, CstI 1 )   }  
+  | Access PLUSASSIGN Expr                { Emun("+=", $1, $3 ) }
+  | Access MINUSASSIGN Expr               { Emun("-=", $1, $3 ) }
+  | Access TIMESASSIGN Expr               { Emun("*=", $1, $3 ) }
+  | Access DIVASSIGN Expr                 { Emun("/=", $1, $3 ) }
+  | Access MODASSIGN Expr                 { Emun("%=", $1, $3 ) }
   | Expr SEQAND Expr                    { Andalso($1, $3)     }
   | Expr SEQOR  Expr                    { Orelse($1, $3)      }
 ;

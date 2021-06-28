@@ -31,7 +31,7 @@ and expr =                           // 表达式，右值
   | Andalso of expr * expr           (* Sequential and              *)
   | Orelse of expr * expr            (* Sequential or               *)
   | Call of string * expr list       (* Function call f(...)        *)
-  | SimpleOpt of  string * access * expr
+  | Emun of  string * access * expr
 
 and access =                         //左值，存储的位置                                            
   | AccVar of string                 (* Variable access        x    *) 
@@ -48,6 +48,7 @@ and stmt =
   | DoWhile of stmt * expr
   | Case of expr * stmt
   | Switch of expr * stmt list
+  | Default of stmt 
   // 语句块内部，可以是变量声明 或语句的列表                                                              
 
 and stmtordec =                                                    
