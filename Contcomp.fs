@@ -195,6 +195,64 @@ let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (C : instr list) : instr 
       let (jumptest, C1) = 
            makeJump (cExpr e varEnv funEnv (IFNZRO labbegin :: C))
       addJump jumptest (Label labbegin :: cStmt body varEnv funEnv C1)
+    | DoWhile (body, e) ->
+        let labbegin = newLabel () //出口位置
+        let C1 =
+            cExpr e varEnv funEnv (IFNZRO labbegin :: C)
+        Label labbegin :: cStmt body varEnv funEnv C1    
+    // | For (e1, e2, e3, body) ->
+    //     let labbegin = newLabel ()
+    //     let (jumptest, C1) =
+    //         makeJump (cExpr e2 varEnv funEnv (IFNZRO labbegin :: C)) //根据for循环第二个表达式判断是否跳转
+    //     let C2 = cExpr e3 varEnv funEnv (addINCSP -1 C1) //执行for循环第三个表达式
+    //     let C3 =
+    //         Label labbegin :: cStmt body varEnv funEnv C2
+    //     let C4 = addJump jumptest C3 //根据当前情况跳转
+    //     cExpr e1 varEnv funEnv (addINCSP -1 C4) //汇编指令拼接
+    // | For (e1, e2, e3, body) ->
+    //   let labend   = newLabel()                       //结束label
+    //   let labbegin = newLabel()                       //设置label 
+    //   let labope   = newLabel()                       //设置 for(,,opera) 的label
+    //   let Cend = Label labend :: C
+    //   let (jumptest, C1) =
+    //     makeJump (cExpr e2 varEnv funEnv (IFNZRO labbegin :: Cend))
+    //   let C2 = Label labope :: cExpr e3 varEnv funEnv (addINCSP -1 C1)
+    //   let C3 = cStmt body varEnv funEnv C2    
+    //   cExpr e1 varEnv funEnv (addINCSP -1 (addJump jumptest  (Label labbegin :: C3) ) )
+
+    | For(dec, e, opera,body) ->
+        let labend   = newLabel()                       //结束label
+        let labbegin = newLabel()                       //设置label 
+        let labope   = newLabel()                       //设置 for(,,opera) 的label
+        let Cend = Label labend :: C
+        let (jumptest, C2) =                                                
+            makeJump (cExpr e varEnv funEnv (IFNZRO labbegin :: Cend)) 
+        let C3 = Label labope :: cExpr opera varEnv funEnv (addINCSP -1 C2)
+        let C4 = cStmt body varEnv funEnv C3    
+        cExpr dec varEnv funEnv (addINCSP -1 (addJump jumptest  (Label labbegin :: C4) ) ) //dec Label: body  opera  testjumpToBegin 指令的顺序
+
+    | Switch (e, cases) ->
+        let (labend, C1) = addLabel C //确定出口
+        let lablist = labend :: []
+
+        let rec everycase c =
+            match c with
+            | Case (cond, body) :: tr ->
+                let (labnextbody, labnext, C2) = everycase tr //获取后续case的指令
+
+                let (label, C3) =
+                    addLabel (cStmt body varEnv funEnv (addGOTO labend C2)) //出口位置与指令拼接
+
+                let (label2, C4) =
+                    addLabel (cExpr (Prim2("==", e, cond)) varEnv funEnv (IFZERO labnext :: C3))
+
+                (label, label2, C4)
+            | [] -> (labend, labend, C1)
+
+        let (label, label2, C2) = everycase cases
+        C2
+    // | Case (cond, body) -> C
+
     | Expr e -> 
       cExpr e varEnv funEnv (addINCSP -1 C) 
     | Block stmts -> 
@@ -224,7 +282,11 @@ and bStmtordec stmtOrDec varEnv : bstmtordec * VarEnv =
     | Dec (typ, x) ->
       let (varEnv1, code) = allocate Locvar (typ, x) varEnv 
       (BDec code, varEnv1)
-
+    | DecAndAssign (typ,x,e) -> 
+      let (varEnv1, code) = allocate Locvar (typ,x) varEnv
+      (BDec (cAccess (AccVar(x)) varEnv1 []  // cAccess 增加 x变量 对应的 的指令
+                (cExpr e varEnv1 [] (STI :: (addINCSP -1 code))) // 取出这个变量 给他赋值 
+            ), varEnv1)
 (* Compiling micro-C expressions: 
 
    * e       is the expression to compile
@@ -269,6 +331,41 @@ and cExpr (e : expr) (varEnv : VarEnv) (funEnv : FunEnv) (C : instr list) : inst
             | ">"   -> SWAP :: LT :: C
             | "<="  -> SWAP :: LT :: addNOT C
             | _     -> failwith "unknown primitive 2"))
+    | Emun(ope,acc,e)->             
+        cExpr e varEnv funEnv  
+            (match ope with
+            | "+=" -> 
+                let ass = Assign (acc,Prim2("+",Access acc, e))
+                cExpr ass varEnv funEnv (addINCSP -1 C)
+            | "-=" ->
+                let ass = Assign (acc,Prim2("-",Access acc, e))
+                cExpr ass varEnv funEnv (addINCSP -1 C)
+            | "++Z" -> 
+                let ass = Assign (acc,Prim2("+",Access acc, e))
+                let C1 = cExpr ass varEnv funEnv C
+                CSTI 1 :: ADD :: (addINCSP -1 C1)
+            | "Z++" -> 
+                let ass = Assign (acc,Prim2("+",Access acc, e))
+                let C1 = cExpr ass varEnv funEnv C
+                CSTI 1 :: ADD :: (addINCSP -1 C1)
+            | "--Z" ->
+                let ass = Assign (acc,Prim2("-",Access acc, e))
+                let C1 = cExpr ass varEnv funEnv C
+                CSTI 1 :: SUB :: (addINCSP -1 C1)  
+            | "Z--" ->
+                let ass = Assign (acc,Prim2("-",Access acc, e))
+                let C1 = cExpr ass varEnv funEnv C
+                CSTI 1 :: SUB :: (addINCSP -1 C1)      
+            | "*=" -> 
+                let ass = Assign (acc,Prim2("*",Access acc, e))
+                cExpr ass varEnv funEnv (addINCSP -1 C)
+            | "/=" ->
+                let ass = Assign (acc,Prim2("/",Access acc, e))
+                cExpr ass varEnv funEnv (addINCSP -1 C)
+            | "%=" ->
+                let ass = Assign (acc,Prim2("%",Access acc, e))
+                cExpr ass varEnv funEnv (addINCSP -1 C)
+            | _         -> failwith "Error: unknown unary operator")
     | Andalso(e1, e2) ->
       match C with
       | IFZERO lab :: _ ->
