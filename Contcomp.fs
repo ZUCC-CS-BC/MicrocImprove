@@ -200,25 +200,6 @@ let rec cStmt stmt (varEnv : VarEnv) (funEnv : FunEnv) (C : instr list) : instr 
         let C1 =
             cExpr e varEnv funEnv (IFNZRO labbegin :: C)
         Label labbegin :: cStmt body varEnv funEnv C1    
-    // | For (e1, e2, e3, body) ->
-    //     let labbegin = newLabel ()
-    //     let (jumptest, C1) =
-    //         makeJump (cExpr e2 varEnv funEnv (IFNZRO labbegin :: C)) //根据for循环第二个表达式判断是否跳转
-    //     let C2 = cExpr e3 varEnv funEnv (addINCSP -1 C1) //执行for循环第三个表达式
-    //     let C3 =
-    //         Label labbegin :: cStmt body varEnv funEnv C2
-    //     let C4 = addJump jumptest C3 //根据当前情况跳转
-    //     cExpr e1 varEnv funEnv (addINCSP -1 C4) //汇编指令拼接
-    // | For (e1, e2, e3, body) ->
-    //   let labend   = newLabel()                       //结束label
-    //   let labbegin = newLabel()                       //设置label 
-    //   let labope   = newLabel()                       //设置 for(,,opera) 的label
-    //   let Cend = Label labend :: C
-    //   let (jumptest, C1) =
-    //     makeJump (cExpr e2 varEnv funEnv (IFNZRO labbegin :: Cend))
-    //   let C2 = Label labope :: cExpr e3 varEnv funEnv (addINCSP -1 C1)
-    //   let C3 = cStmt body varEnv funEnv C2    
-    //   cExpr e1 varEnv funEnv (addINCSP -1 (addJump jumptest  (Label labbegin :: C3) ) )
 
     | For(dec, e, opera,body) ->
         let labend   = newLabel()                       //结束label
@@ -331,6 +312,11 @@ and cExpr (e : expr) (varEnv : VarEnv) (funEnv : FunEnv) (C : instr list) : inst
             | ">"   -> SWAP :: LT :: C
             | "<="  -> SWAP :: LT :: addNOT C
             | _     -> failwith "unknown primitive 2"))
+    | Prim3 (e1, e2, e3) ->
+      let (jumpend, C1) = makeJump C
+      let (labelse, C2) = addLabel (cExpr e3 varEnv funEnv C1)
+      cExpr e1 varEnv funEnv (IFZERO labelse 
+      :: cExpr e2 varEnv funEnv (addJump jumpend C2))
     | Emun(ope,acc,e)->             
         cExpr e varEnv funEnv  
             (match ope with

@@ -35,6 +35,7 @@ type token =
   | DIVASSIGN
   | MODASSIGN
   | PLUSPLUSPLUS
+  | QUES
   | CHAR
   | ELSE
   | IF
@@ -92,6 +93,7 @@ type tokenId =
     | TOKEN_DIVASSIGN
     | TOKEN_MODASSIGN
     | TOKEN_PLUSPLUSPLUS
+    | TOKEN_QUES
     | TOKEN_CHAR
     | TOKEN_ELSE
     | TOKEN_IF
@@ -144,6 +146,7 @@ type nonTerminalId =
     | NONTERM_Type
     | NONTERM_ConstChar
     | NONTERM_ConstString
+    | NONTERM_StmtCase
 /// This function maps tokens to integer indexes
 val tagOfToken: token -> int
 
